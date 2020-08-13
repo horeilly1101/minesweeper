@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+service Minesweeper {
+  rpc clickTile (ClickAction) returns (ClickResponse) {}
+}
+
+message ClickAction {
+  int32 tile_row = 1;
+  int32 tile_col = 2;
+  enum ClickType {
+    UNCOVER = 0;
+    FLAG = 1;
+  }
+  ClickType click_type = 3;
+}
+
+message ClickResponse {
+
+}
