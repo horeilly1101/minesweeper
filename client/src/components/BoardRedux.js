@@ -1,5 +1,7 @@
 import React from 'react';
-import Square from './SquareRedux'
+import { connect } from "react-redux";
+import Square from './SquareRedux';
+import { clickSquare } from "../redux/actions";
 
 
 class Board extends React.Component {
@@ -7,7 +9,7 @@ class Board extends React.Component {
         return (
             <Square
                 value={this.props.squares[i]}
-                onClick={() => this.props.onClick(i)}
+                onClick={() => this.props.handleClick(i)}
             />
         );
     }
@@ -35,4 +37,15 @@ class Board extends React.Component {
     }
 }
 
-export default Board;
+const mapStateToProps = state => ({
+    squares: state.history[state.stepNumber]["squares"]
+});
+
+const mapDispatchToProps = dispatch => ({
+    handleClick: squareId => dispatch(clickSquare(squareId))
+});
+
+export default connect(
+    mapStateToProps,
+    mapDispatchToProps
+)(Board);
