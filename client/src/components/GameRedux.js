@@ -6,11 +6,7 @@ import { clickHistory } from "../redux/actions";
 
 
 const Game = props => {
-    const history = props.history;
-    const current = history[props.stepNumber];
-    const winner = calculateWinner(current.squares);
-
-    const moves = history.map((step, move) => {
+    const moves = props.history.map((step, move) => {
         const desc = move ?
             'Go to move #' + move :
             'Go to game start';
@@ -22,8 +18,8 @@ const Game = props => {
     });
 
     let status;
-    if (winner) {
-        status = 'Winner: ' + winner;
+    if (props.winner) {
+        status = 'Winner: ' + props.winner;
     } else {
         status = 'Next player: ' + (props.xIsNext ? 'X' : 'O');
     }
@@ -46,6 +42,7 @@ const mapStateToProps = state => {
     return {
         history: state.history,
         stepNumber: state.stepNumber,
+        winner: state.winner,
         xIsNext: state.xIsNext,
     }
 };

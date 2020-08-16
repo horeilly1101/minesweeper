@@ -11,4 +11,4 @@ const Square = props => {
     );
 };
 
-export default Square
+export default Square;

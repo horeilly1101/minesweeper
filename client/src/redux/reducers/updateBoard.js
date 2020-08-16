@@ -6,6 +6,7 @@ const initialState = {
         squares: Array(9).fill(null),
     }],
     stepNumber: 0,
+    winner: null,
     xIsNext: true,
 };
 
@@ -16,23 +17,31 @@ const updateBoard = (state = initialState, action) => {
             const history = state.history.slice(0, state.stepNumber + 1);
             const current = history[history.length - 1];
             const squares = current.squares.slice();
-            if (calculateWinner(squares) || squares[action.squareId]) {
+            // Do nothing if the game is already over, or if the square
+            // has already been clicked.
+            if (state.winner || squares[action.squareId]) {
                 return state;
             }
+            // Update the squares with the new move.
             squares[action.squareId] = state.xIsNext ? 'X' : 'O';
             return {
                 "history": history.concat([{
                     squares: squares,
                 }]),
                 "stepNumber": history.length,
+                "winner": calculateWinner(squares),
                 "xIsNext": !state.xIsNext,
             };
         }
         case CLICK_HISTORY: {
+            if (action.stepNumber === state.stepNumber) {
+                return state;
+            }
             return {
                 ...state,
-                stepNumber: action.stepNumber,
-                xIsNext: (action.stepNumber % 2) === 0,
+                "stepNumber": action.stepNumber,
+                "winner": null,
+                "xIsNext": (action.stepNumber % 2) === 0,
             };
         }
         default: {
