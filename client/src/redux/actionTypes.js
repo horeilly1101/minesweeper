@@ -1,0 +1,2 @@
+export const CLICK_SQUARE = "CLICK_SQUARE";
+export const CLICK_HISTORY = "CLICK_HISTORY";
