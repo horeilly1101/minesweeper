@@ -1,34 +1,45 @@
 import React from 'react';
-import { HIDDEN, CLEARED, BOMB } from "../squareStatus";
+import { HIDDEN, CLEARED, BOMB, FLAGGED } from "../squareStatus";
 
-const Square = props => {
-    let value;
-    switch (props.status) {
-        case HIDDEN: {
-            value = "?";
-            break;
-        }
-        case CLEARED: {
-            value = "8";
-            break;
-        }
-        case BOMB: {
-            value = "💣";
-            break;
-        }
-        default: {
-            value = "uh";
-            break;
-        }
+class Square extends React.Component {
+    shouldComponentUpdate(nextProps) {
+        return (this.props.status !== nextProps.status);
     }
-    return (
-        <button
-            className="square"
-            onClick={props.onClick}
-        >
-            {value}
-        </button>
-    );
-};
+
+    render() {
+        let value;
+        switch (this.props.status) {
+            case HIDDEN: {
+                value = "";
+                break;
+            }
+            case CLEARED: {
+                value = this.props.count.toString();
+                break;
+            }
+            case BOMB: {
+                value = "💣";
+                break;
+            }
+            case FLAGGED: {
+                value = "🚩";
+                break;
+            }
+            default: {
+                value = "uh";
+                break;
+            }
+        }
+        return (
+            <button
+                className="square"
+                onClick={this.props.onClick}
+                onContextMenu={this.props.onContextMenu}
+            >
+                {value}
+            </button>
+        );
+    }
+}
 
 export default Square;

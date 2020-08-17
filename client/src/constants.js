@@ -1,2 +1,2 @@
-export const numRows = 5;
-export const numCols = 5;
+export const numRows = 20;
+export const numCols = 20;

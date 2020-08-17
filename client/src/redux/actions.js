@@ -1,11 +1,13 @@
 import { FLAG_SQUARE, REVEAL_SQUARE } from "./actionTypes";
 
-export const flagSquare = squareId => ({
+export const flagSquare = (row, col) => ({
     type: FLAG_SQUARE,
-    squareId: squareId,
+    squareRow: row,
+    squareCol: col,
 });
 
-export const revealSquare = squareId => ({
+export const revealSquare = (row, col) => ({
     type: REVEAL_SQUARE,
-    squareId: squareId,
+    squareRow: row,
+    squareCol: col,
 });

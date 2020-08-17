@@ -6,15 +6,19 @@ import { numRows, numCols } from "../constants";
 
 
 class Board extends React.Component {
-    renderSquare(i) {
-        const status = this.props.statuses[i];
-        const count = this.props.counts[i];
+    renderSquare(row, col) {
+        const status = this.props.statuses[row][col];
+        const count = this.props.counts[row][col];
         return (
             <Square
-                key={i}
+                key={col}
                 status={status}
-                bombCount={count}
-                onClick={() => this.props.handleClick(i)}
+                count={count}
+                onClick={() => this.props.handleClick(row, col)}
+                onContextMenu={e => {
+                    e.preventDefault();
+                    this.props.handleRightClick(row, col);
+                }}
             />
         );
     }
@@ -24,7 +28,7 @@ class Board extends React.Component {
             <div className="board-row" key={row}>
                 {Array(numCols)
                     .fill(null)
-                    .map((val, i) => this.renderSquare(row * numCols + i))}
+                    .map((val, i) => this.renderSquare(row, i))}
             </div>
         );
     }
@@ -46,7 +50,8 @@ const mapStateToProps = state => ({
 });
 
 const mapDispatchToProps = dispatch => ({
-    handleClick: squareId => dispatch(revealSquare(squareId))
+    handleClick: (row, col) => dispatch(revealSquare(row, col)),
+    handleRightClick: (row, col) => dispatch(flagSquare(row, col)),
 });
 
 export default connect(

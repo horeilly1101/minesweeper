@@ -24,7 +24,6 @@ const Game = props => {
 };
 
 const mapStateToProps = state => {
-    console.log(state);
     return {
         squares: state.squares,
         isOver: state.isOver,
