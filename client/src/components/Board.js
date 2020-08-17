@@ -1,15 +1,19 @@
 import React from 'react';
 import { connect } from "react-redux";
 import Square from './Square';
-import { clickSquare } from "../redux/actions";
+import { flagSquare, revealSquare } from "../redux/actions";
 import { numRows, numCols } from "../constants";
 
 
 class Board extends React.Component {
     renderSquare(i) {
+        const status = this.props.statuses[i];
+        const count = this.props.counts[i];
         return (
             <Square
-                value={this.props.squares[i]}
+                key={i}
+                status={status}
+                bombCount={count}
                 onClick={() => this.props.handleClick(i)}
             />
         );
@@ -17,7 +21,7 @@ class Board extends React.Component {
 
     renderRow(row) {
         return (
-            <div className="board-row">
+            <div className="board-row" key={row}>
                 {Array(numCols)
                     .fill(null)
                     .map((val, i) => this.renderSquare(row * numCols + i))}
@@ -37,11 +41,12 @@ class Board extends React.Component {
 }
 
 const mapStateToProps = state => ({
-    squares: state.history[state.stepNumber]["squares"]
+    statuses: state.statuses,
+    counts: state.counts,
 });
 
 const mapDispatchToProps = dispatch => ({
-    handleClick: squareId => dispatch(clickSquare(squareId))
+    handleClick: squareId => dispatch(revealSquare(squareId))
 });
 
 export default connect(

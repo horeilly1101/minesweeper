@@ -1,11 +1,11 @@
-import { CLICK_SQUARE, CLICK_HISTORY } from "./actionTypes";
+import { FLAG_SQUARE, REVEAL_SQUARE } from "./actionTypes";
 
-export const clickSquare = squareId => ({
-    type: CLICK_SQUARE,
+export const flagSquare = squareId => ({
+    type: FLAG_SQUARE,
     squareId: squareId,
 });
 
-export const clickHistory = stepNumber => ({
-    type: CLICK_HISTORY,
-    stepNumber: stepNumber,
+export const revealSquare = squareId => ({
+    type: REVEAL_SQUARE,
+    squareId: squareId,
 });

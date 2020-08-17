@@ -1,66 +1,73 @@
-import { CLICK_SQUARE, CLICK_HISTORY } from "../actionTypes";
+import { FLAG_SQUARE, REVEAL_SQUARE } from "../actionTypes";
+import { numCols, numRows } from "../../constants";
+import { HIDDEN, CLEARED, BOMB, FLAGGED } from "../../squareStatus";
 
-const initialState = {
-    history: [{
-        squares: Array(9).fill(null),
-    }],
-    stepNumber: 0,
-    winner: null,
-    xIsNext: true,
+const NUM_BOMBS = numRows + numCols;
+const BOARD_SIZE = numRows * numCols;
+const INITIAL_STATE = {
+    bombSquares: new Set(),
+    statuses: Array(BOARD_SIZE).fill(HIDDEN),
+    counts: Array(BOARD_SIZE).fill(null),
+    isFirstMove: true,
+    isOver: false,
 };
 
-export const calculateWinner = (squares) => {
-    const lines = [
-        [0, 1, 2],
-        [3, 4, 5],
-        [6, 7, 8],
-        [0, 3, 6],
-        [1, 4, 7],
-        [2, 5, 8],
-        [0, 4, 8],
-        [2, 4, 6],
-    ];
-    for (let i = 0; i < lines.length; i++) {
-        const [a, b, c] = lines[i];
-        if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
-            return squares[a];
-        }
+// Source: https://stackoverflow.com/questions/2450954
+const shuffleArray = array => {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
     }
-    return null;
 };
 
-const updateBoard = (state = initialState, action) => {
+const initializeBombSquares = () => {
+    // Randomly select the bomb squares.
+    let bombSquares = Array(BOARD_SIZE)
+        .fill(null)
+        .map((val, i) => i);
+    shuffleArray(bombSquares);
+    const set = new Set();
+    bombSquares
+        .slice(0, NUM_BOMBS)
+        .forEach(value => set.add(value));
+    return set;
+};
+
+const updateBoard = (state = INITIAL_STATE, action) => {
     switch (action.type) {
-        case CLICK_SQUARE: {
-            const history = state.history.slice(0, state.stepNumber + 1);
-            const current = history[history.length - 1];
-            const squares = current.squares.slice();
-            // Do nothing if the game is already over, or if the square
-            // has already been clicked.
-            if (state.winner || squares[action.squareId]) {
+        case REVEAL_SQUARE: {
+            // Do nothing if the square is not hidden, or if the game
+            // is already over.
+            const squareStatus = state.statuses[action.squareId];
+            if (squareStatus !== HIDDEN || state.isOver) {
                 return state;
             }
-            // Update the squares with the new move.
-            squares[action.squareId] = state.xIsNext ? 'X' : 'O';
-            return {
-                "history": history.concat([{
-                    squares: squares,
-                }]),
-                "stepNumber": history.length,
-                "winner": calculateWinner(squares),
-                "xIsNext": !state.xIsNext,
-            };
-        }
-        case CLICK_HISTORY: {
-            if (action.stepNumber === state.stepNumber) {
-                return state;
+            // Initialize the bomb squares, if this is the first
+            // move. It's useful to do this here, so that the player
+            // doesn't accidentally click the bomb at the start.
+            let bombSquares = state.bombSquares;
+            if (state.isFirstMove) {
+                bombSquares = initializeBombSquares();
+            }
+            // Update the rest of the state.
+            const newStatuses = [...state.statuses];
+            let isOver = state.isOver;
+            if (state.bombSquares.has(action.squareId)) {
+                newStatuses[action.squareId] = BOMB;
+                isOver = true;
+            } else {
+                newStatuses[action.squareId] = CLEARED;
             }
             return {
                 ...state,
-                "stepNumber": action.stepNumber,
-                "winner": null,
-                "xIsNext": (action.stepNumber % 2) === 0,
-            };
+                "bombSquares": bombSquares,
+                "statuses": newStatuses,
+                "isFirstMove": false,
+                "isOver": isOver,
+            }
+        }
+        case FLAG_SQUARE: {
+            return state;
         }
         default: {
             return state;
