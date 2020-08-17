@@ -19,7 +19,7 @@ ol, ul {
 
 .square {
   background: #fff;
-  border: 1px solid #999;
+  border: 1px solid #000000;
   float: left;
   font-size: 24px;
   font-weight: bold;
@@ -34,6 +34,18 @@ ol, ul {
 
 .square:focus {
   outline: none;
+}
+
+.bomb-square {
+  background: lightcoral;
+}
+
+.hidden-square {
+  background: #3AA3FF;
+}
+
+.cleared-square {
+  background: #CCE7FF;
 }
 
 .kbd-navigation .square:focus {

@@ -7,32 +7,30 @@ class Square extends React.Component {
     }
 
     render() {
-        let value;
-        switch (this.props.status) {
-            case HIDDEN: {
-                value = "";
-                break;
-            }
-            case CLEARED: {
-                value = this.props.count.toString();
-                break;
-            }
-            case BOMB: {
-                value = "💣";
-                break;
-            }
-            case FLAGGED: {
-                value = "🚩";
-                break;
-            }
-            default: {
-                value = "uh";
-                break;
-            }
-        }
+        const infoProducers = {
+            HIDDEN: () => ({
+                value: "",
+                styleClass: "hidden-square"
+            }),
+            CLEARED: () => ({
+                value: this.props.count.toString(),
+                styleClass: "cleared-square"
+            }),
+            BOMB: () => ({
+                value: "💣",
+                styleClass: "bomb-square"
+            }),
+            FLAGGED: () => ({
+                value: "🚩",
+                styleClass: "hidden-square"
+            }),
+        };
+        const info = infoProducers[this.props.status]();
+        const value = info.value;
+        const styleClass = info.styleClass;
         return (
             <button
-                className="square"
+                className={"square " + styleClass}
                 onClick={this.props.onClick}
                 onContextMenu={this.props.onContextMenu}
             >
