@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from "react-redux";
 import Board from './Board';
-import {restartGame} from "../actions/actions";
+import {restartGame} from "../actions";
 
 
 const Game = props => {

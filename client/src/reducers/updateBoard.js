@@ -1,9 +1,9 @@
 import {
-    FLAG_SQUARE, REVEAL_SQUARE, RESTART_GAME, INIT_BOMB_SQUARES
-} from "../actions/actionTypes";
+    REVEAL_SQUARE} from "../actions";
 import { numCols, numRows, NUM_BOMBS, BOARD_SIZE } from "../constants";
 import { HIDDEN, CLEARED, BOMB, FLAGGED } from "../squareStatus";
 import * as _ from "underscore";
+import {FLAG_SQUARE, INIT_BOMB_SQUARES, RESTART_GAME} from "../actions";
 
 const INITIAL_STATE = {
     bombSquares: new Set(),
@@ -85,20 +85,16 @@ const clearEmptySquares = (squares, bombSquares, squareId) => {
 const updateBoard = (state = INITIAL_STATE, action) => {
     switch (action.type) {
         case INIT_BOMB_SQUARES: {
-            if (state.isFirstMove) {
-                const bombSquares = initializeBombSquares();
-                bombSquares.delete(action.squareId);
-                return {...state, bombSquares};
-            }
-            return state;
+            const bombSquares = initializeBombSquares();
+            bombSquares.delete(action.squareId);
+            return {...state, bombSquares, isFirstMove: false};
         }
 
         case REVEAL_SQUARE: {
             const squareId = action.squareId;
-            // Do nothing if the square is not hidden, or if the game
-            // is already over.
+            // Do nothing if the square is not hidden.
             const squareStatus = state.squares[squareId].status;
-            if (squareStatus !== HIDDEN || state.isOver) {
+            if (squareStatus !== HIDDEN) {
                 return state;
             }
             // End the game if the bomb was clicked.
@@ -110,24 +106,17 @@ const updateBoard = (state = INITIAL_STATE, action) => {
                 };
                 return {...state, squares, isOver: true};
             }
-            // Update the board statuses and counts.
+            // Reveal the selected square.
             let squares = {...state.squares};
             const count = countSurroundingBombs(state.bombSquares, squareId);
             squares[squareId] = {count, status: CLEARED};
             if (count === 0) {
                 squares = clearEmptySquares(squares, state.bombSquares, squareId);
             }
-            return {
-                ...state,
-                squares,
-                isFirstMove: false,
-            }
+            return {...state, squares};
         }
 
         case FLAG_SQUARE: {
-            if (state.isOver) {
-                return state;
-            }
             const square = state.squares[action.squareId];
             if (square.status === HIDDEN) {
                 const newSquares = {...state.squares};
