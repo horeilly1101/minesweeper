@@ -6,8 +6,10 @@ const NUM_BOMBS = 45;
 const BOARD_SIZE = numRows * numCols;
 const INITIAL_STATE = {
     bombSquares: new Set(),
-    statuses: Array(numRows).fill(Array(numCols).fill(HIDDEN)),
-    counts: Array(numRows).fill(Array(numCols).fill(null)),
+    squares: Object.assign({}, Array(BOARD_SIZE).fill({
+        status: HIDDEN,
+        count: null,
+    })),
     isFirstMove: true,
     isOver: false,
 };
@@ -39,63 +41,62 @@ const idToLoc = id => {
     return [row, col];
 };
 
-const copyBoard = rows => [...rows].map(row => [...row]);
+const copyBoard = squares => ({...squares});
 
-const getSurroundingSquares = (row, col) => {
-    const squares = [];
+const getSurroundingSquares = squareId => {
+    // This is easiest to compute if we transform the squareIds to
+    // a row and a column value.
+    const [row, col] = idToLoc(squareId);
+    const surroundingSquares = [];
     for (let i = -1; i <= 1; i++) {
         for (let j = -1; j <= 1; j++) {
             const newRow = row + i;
             const newCol = col + j;
             if (newRow >= 0 && newCol >= 0 && newRow < numRows && newCol < numCols) {
-                squares.push({row: newRow, col: newCol});
+                surroundingSquares.push(locToId(newRow, newCol));
             }
         }
     }
-    return squares;
+    return surroundingSquares;
 };
 
-const countSurroundingBombs = (bombSquares, row, col) => {
+const countSurroundingBombs = (bombSquares, squareId) => {
     let count = 0;
-    const surroundingSquares = getSurroundingSquares(row, col);
+    const surroundingSquares = getSurroundingSquares(squareId);
     for (let i = 0; i < surroundingSquares.length; i++) {
-        let {row: row, col: col} = surroundingSquares[i];
-        if (bombSquares.has(locToId(row, col))) {
+        const neighborId = surroundingSquares[i];
+        if (bombSquares.has(neighborId)) {
             count++;
         }
     }
     return count;
 };
 
-const clearEmptySquares = (counts, statuses, bombSquares, row, col) => {
+const clearEmptySquares = (squares, bombSquares, squareId) => {
     // Run a depth first search to clear out the nearby
     // squares that don't have any surrounding bombs.
     const seen = new Set();
     const stack = [];
-    stack.push(locToId(row, col));
-    seen.add(locToId(row, col));
+    stack.push(squareId);
+    seen.add(squareId);
 
     while (stack.length > 0) {
-        const node = stack.pop();
-        const [nodeRow, nodeCol] = idToLoc(node);
-        const count = countSurroundingBombs(bombSquares, nodeRow, nodeCol);
-        counts[nodeRow][nodeCol] = count;
-        if (bombSquares.has(node)) {
+        const nextId = stack.pop();
+        if (bombSquares.has(nextId)) {
             continue;
         }
-
-        statuses[nodeRow][nodeCol] = CLEARED;
+        const count = countSurroundingBombs(bombSquares, nextId);
+        squares[nextId] = {count: count, status: CLEARED};
         if (count > 0) {
             continue;
         }
-        const surrounding = getSurroundingSquares(nodeRow, nodeCol);
+        const surrounding = getSurroundingSquares(nextId);
         for (let i = 0; i < surrounding.length; i++) {
-            const successor = surrounding[i];
-            if (seen.has(locToId(successor.row, successor.col))) {
-                continue;
+            const successorId = surrounding[i];
+            if (!seen.has(successorId)) {
+                stack.push(successorId);
+                seen.add(successorId);
             }
-            stack.push(locToId(successor.row, successor.col));
-            seen.add(locToId(successor.row, successor.col));
         }
     }
 };
@@ -103,19 +104,21 @@ const clearEmptySquares = (counts, statuses, bombSquares, row, col) => {
 const updateBoard = (state = INITIAL_STATE, action) => {
     switch (action.type) {
         case REVEAL_SQUARE: {
-            const row = action.squareRow;
-            const col = action.squareCol;
+            const squareId = action.squareId;
             // Do nothing if the square is not hidden, or if the game
             // is already over.
-            const squareStatus = state.statuses[row][col];
+            const squareStatus = state.squares[squareId].status;
             if (squareStatus !== HIDDEN || state.isOver) {
                 return state;
             }
             // End the game if the bomb was clicked.
-            if (state.bombSquares.has(locToId(row, col))) {
-                const statuses = copyBoard(state.statuses);
-                statuses[row][col] = BOMB;
-                return {...state, statuses, isOver: true};
+            if (state.bombSquares.has(squareId)) {
+                const squares = copyBoard(state.squares);
+                squares[squareId] = {
+                    ...squares[squareId],
+                    status: BOMB,
+                };
+                return {...state, squares, isOver: true};
             }
             // Initialize the bomb squares, if this is the first
             // move. It's useful to do this here, so that the player
@@ -123,42 +126,50 @@ const updateBoard = (state = INITIAL_STATE, action) => {
             let bombSquares = state.bombSquares;
             if (state.isFirstMove) {
                 bombSquares = initializeBombSquares();
-                bombSquares.delete(locToId(row, col));
+                bombSquares.delete(squareId);
             }
             // Update the board statuses and counts.
-            const statuses = copyBoard(state.statuses);
-            statuses[row][col] = CLEARED;
-            let counts = state.counts;
-            if (!counts[row][col]) {
-                counts = copyBoard(state.counts);
-                const count = countSurroundingBombs(bombSquares, row, col);
-                counts[row][col] = count;
+            const squares = copyBoard(state.squares);
+            squares[squareId] = {
+                ...squares[squareId],
+                status: CLEARED,
+            };
+            if (!squares[squareId].count) {
+                const count = countSurroundingBombs(bombSquares, squareId);
+                console.log(count);
+                squares[squareId] = {
+                    ...squares[squareId],
+                    count: count,
+                };
                 if (count === 0) {
-                    clearEmptySquares(counts, statuses, bombSquares, row, col);
+                    clearEmptySquares(squares, bombSquares, squareId);
                 }
             }
             return {
                 ...state,
                 "bombSquares": bombSquares,
-                "counts": counts,
-                "statuses": statuses,
+                "squares": squares,
                 "isFirstMove": false,
             }
         }
 
         case FLAG_SQUARE: {
-            const row = action.squareRow;
-            const col = action.squareCol;
-            const squareStatus = state.statuses[row][col];
-            if (squareStatus === HIDDEN) {
-                const statuses = copyBoard(state.statuses);
-                statuses[row][col] = FLAGGED;
-                return {...state, statuses};
+            const square = state.squares[action.squareId];
+            if (square.status === HIDDEN) {
+                const newSquares = copyBoard(state.squares);
+                newSquares[action.squareId] = {
+                    ...newSquares[action.squareId],
+                    status: FLAGGED,
+                };
+                return {...state, squares: newSquares};
             }
-            if (squareStatus === FLAGGED) {
-                const statuses = copyBoard(state.statuses);
-                statuses[row][col] = HIDDEN;
-                return {...state, statuses};
+            if (square.status === FLAGGED) {
+                const newSquares = copyBoard(state.squares);
+                newSquares[action.squareId] = {
+                    ...newSquares[action.squareId],
+                    status: HIDDEN,
+                };
+                return {...state, squares: newSquares};
             }
             return state;
         }

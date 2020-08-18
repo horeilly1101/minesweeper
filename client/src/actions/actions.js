@@ -1,15 +1,13 @@
 import { FLAG_SQUARE, REVEAL_SQUARE, RESTART_GAME } from "./actionTypes";
 
-export const flagSquare = (row, col) => ({
+export const flagSquare = squareId => ({
     type: FLAG_SQUARE,
-    squareRow: row,
-    squareCol: col,
+    squareId: squareId,
 });
 
-export const revealSquare = (row, col) => ({
+export const revealSquare = squareId => ({
     type: REVEAL_SQUARE,
-    squareRow: row,
-    squareCol: col,
+    squareId: squareId,
 });
 
 export const restartGame = () => ({
