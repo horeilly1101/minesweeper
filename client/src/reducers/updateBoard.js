@@ -1,4 +1,6 @@
-import { FLAG_SQUARE, REVEAL_SQUARE, RESTART_GAME } from "../actions/actionTypes";
+import {
+    FLAG_SQUARE, REVEAL_SQUARE, RESTART_GAME, INIT_BOMB_SQUARES
+} from "../actions/actionTypes";
 import { numCols, numRows, NUM_BOMBS, BOARD_SIZE } from "../constants";
 import { HIDDEN, CLEARED, BOMB, FLAGGED } from "../squareStatus";
 import * as _ from "underscore";
@@ -82,6 +84,15 @@ const clearEmptySquares = (squares, bombSquares, squareId) => {
 
 const updateBoard = (state = INITIAL_STATE, action) => {
     switch (action.type) {
+        case INIT_BOMB_SQUARES: {
+            if (state.isFirstMove) {
+                const bombSquares = initializeBombSquares();
+                bombSquares.delete(action.squareId);
+                return {...state, bombSquares};
+            }
+            return state;
+        }
+
         case REVEAL_SQUARE: {
             const squareId = action.squareId;
             // Do nothing if the square is not hidden, or if the game
@@ -99,28 +110,16 @@ const updateBoard = (state = INITIAL_STATE, action) => {
                 };
                 return {...state, squares, isOver: true};
             }
-            // Initialize the bomb squares, if this is the first
-            // move. It's useful to do this here, so that the player
-            // doesn't accidentally click the bomb at the start.
-            let bombSquares = state.bombSquares;
-            if (state.isFirstMove) {
-                bombSquares = initializeBombSquares();
-                bombSquares.delete(squareId);
-            }
             // Update the board statuses and counts.
             let squares = {...state.squares};
-            const count = countSurroundingBombs(bombSquares, squareId);
-            squares[squareId] = {
-                count: count,
-                status: CLEARED,
-            };
+            const count = countSurroundingBombs(state.bombSquares, squareId);
+            squares[squareId] = {count, status: CLEARED};
             if (count === 0) {
-                squares = clearEmptySquares(squares, bombSquares, squareId);
+                squares = clearEmptySquares(squares, state.bombSquares, squareId);
             }
             return {
                 ...state,
-                bombSquares: bombSquares,
-                squares: squares,
+                squares,
                 isFirstMove: false,
             }
         }

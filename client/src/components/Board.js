@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from "react-redux";
 import Square from './Square';
-import { flagSquare, revealSquare } from "../actions/actions";
+import { flagSquare, clickSquare } from "../actions/actions";
 import { numRows, numCols } from "../constants";
 
 
@@ -48,7 +48,7 @@ const mapStateToProps = state => ({
 });
 
 const mapDispatchToProps = dispatch => ({
-    handleClick: squareId => dispatch(revealSquare(squareId)),
+    handleClick: squareId => dispatch(clickSquare(squareId)),
     handleRightClick: squareId => dispatch(flagSquare(squareId)),
 });
 
