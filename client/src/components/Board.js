@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from "react-redux";
 import Square from './Square';
-import { flagSquare, revealSquare } from "../redux/actions";
+import { flagSquare, revealSquare } from "../actions/actions";
 import { numRows, numCols } from "../constants";
 
 

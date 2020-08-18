@@ -1,6 +1,6 @@
-import { FLAG_SQUARE, REVEAL_SQUARE } from "../actionTypes";
-import { numCols, numRows } from "../../constants";
-import { HIDDEN, CLEARED, BOMB, FLAGGED } from "../../squareStatus";
+import { FLAG_SQUARE, REVEAL_SQUARE } from "../actions/actionTypes";
+import { numCols, numRows } from "../constants";
+import { HIDDEN, CLEARED, BOMB, FLAGGED } from "../squareStatus";
 
 const NUM_BOMBS = 45;
 const BOARD_SIZE = numRows * numCols;
