@@ -7,25 +7,25 @@ class Square extends React.Component {
     }
 
     render() {
-        const infoProducers = {
-            HIDDEN: () => ({
+        const infoMap = {
+            HIDDEN: {
                 value: "",
                 styleClass: "hidden-square"
-            }),
-            CLEARED: () => ({
-                value: this.props.count.toString(),
-                styleClass: "cleared-square"
-            }),
-            BOMB: () => ({
+            },
+            CLEARED: {
+                value: (this.props.count) ? this.props.count.toString() : "",
+                styleClass: "cleared-square color-" + this.props.count
+            },
+            BOMB: {
                 value: "💣",
                 styleClass: "bomb-square"
-            }),
-            FLAGGED: () => ({
+            },
+            FLAGGED: {
                 value: "🚩",
                 styleClass: "hidden-square"
-            }),
+            },
         };
-        const info = infoProducers[this.props.status]();
+        const info = infoMap[this.props.status];
         const value = info.value;
         const styleClass = info.styleClass;
         return (

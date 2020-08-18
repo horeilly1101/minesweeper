@@ -19,7 +19,7 @@ ol, ul {
 
 .square {
   background: #fff;
-  border: 1px solid #000000;
+  border: 1px solid #ffffff;
   float: left;
   font-size: 24px;
   font-weight: bold;
@@ -37,7 +37,7 @@ ol, ul {
 }
 
 .bomb-square {
-  background: lightcoral;
+  background: #FF7373;
 }
 
 .hidden-square {
@@ -46,6 +46,46 @@ ol, ul {
 
 .cleared-square {
   background: #CCE7FF;
+}
+
+/*
+ * Describe the text colors for squares that contain
+ * this value.
+ */
+.color-0 {
+
+}
+
+.color-1 {
+  color: #117A65;
+}
+
+.color-2 {
+  color: #6C3483;
+}
+
+.color-3 {
+  color: #D68910;
+}
+
+.color-4 {
+  color: green;
+}
+
+.color-5 {
+  color: green;
+}
+
+.color-6 {
+  color: green;
+}
+
+.color-7 {
+  color: green;
+}
+
+.color-8 {
+  color: green;
 }
 
 .kbd-navigation .square:focus {

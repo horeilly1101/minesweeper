@@ -2,7 +2,7 @@ import { FLAG_SQUARE, REVEAL_SQUARE } from "../actionTypes";
 import { numCols, numRows } from "../../constants";
 import { HIDDEN, CLEARED, BOMB, FLAGGED } from "../../squareStatus";
 
-const NUM_BOMBS = numRows + numCols;
+const NUM_BOMBS = 45;
 const BOARD_SIZE = numRows * numCols;
 const INITIAL_STATE = {
     bombSquares: new Set(),
@@ -34,27 +34,70 @@ const initializeBombSquares = () => {
 const locToId = (row, col) => row * numCols + col;
 
 const idToLoc = id => {
-    const row = id % numCols;
-    const col = id - numCols * Math.floor(id / numCols);
+    const row = Math.floor(id / numCols);
+    const col = id - numCols * row;
     return [row, col];
 };
 
 const copyBoard = rows => [...rows].map(row => [...row]);
 
-const countSurroundingBombs = (bombSquares, row, col) => {
-    let count = 0;
+const getSurroundingSquares = (row, col) => {
+    const squares = [];
     for (let i = -1; i <= 1; i++) {
         for (let j = -1; j <= 1; j++) {
             const newRow = row + i;
             const newCol = col + j;
             if (newRow >= 0 && newCol >= 0 && newRow < numRows && newCol < numCols) {
-                if (bombSquares.has(locToId(newRow, newCol))) {
-                    count++;
-                }
+                squares.push({row: newRow, col: newCol});
             }
         }
     }
+    return squares;
+};
+
+const countSurroundingBombs = (bombSquares, row, col) => {
+    let count = 0;
+    const surroundingSquares = getSurroundingSquares(row, col);
+    for (let i = 0; i < surroundingSquares.length; i++) {
+        let {row: row, col: col} = surroundingSquares[i];
+        if (bombSquares.has(locToId(row, col))) {
+            count++;
+        }
+    }
     return count;
+};
+
+const clearSurroundingSquares = (counts, statuses, bombSquares, row, col) => {
+    // Run a depth first search to clear out the nearby
+    // squares that don't have any surrounding bombs.
+    const seen = new Set();
+    const stack = [];
+    stack.push(locToId(row, col));
+    seen.add(locToId(row, col));
+
+    while (stack.length > 0) {
+        const node = stack.pop();
+        const [nodeRow, nodeCol] = idToLoc(node);
+        const count = countSurroundingBombs(bombSquares, nodeRow, nodeCol);
+        counts[nodeRow][nodeCol] = count;
+        if (bombSquares.has(node)) {
+            continue;
+        }
+
+        statuses[nodeRow][nodeCol] = CLEARED;
+        if (count > 0) {
+            continue;
+        }
+        const surrounding = getSurroundingSquares(nodeRow, nodeCol);
+        for (let i = 0; i < surrounding.length; i++) {
+            const successor = surrounding[i];
+            if (seen.has(locToId(successor.row, successor.col))) {
+                continue;
+            }
+            stack.push(locToId(successor.row, successor.col));
+            seen.add(locToId(successor.row, successor.col));
+        }
+    }
 };
 
 const updateBoard = (state = INITIAL_STATE, action) => {
@@ -87,7 +130,12 @@ const updateBoard = (state = INITIAL_STATE, action) => {
             let counts = state.counts;
             if (!counts[row][col]) {
                 counts = copyBoard(state.counts);
-                counts[row][col] = countSurroundingBombs(bombSquares, row, col);
+                const count = countSurroundingBombs(bombSquares, row, col);
+                counts[row][col] = count;
+                if (count === 0) {
+                    console.log("start clear");
+                    clearSurroundingSquares(counts, statuses, bombSquares, row, col);
+                }
             }
             return {
                 ...state,
