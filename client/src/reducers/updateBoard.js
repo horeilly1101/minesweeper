@@ -1,4 +1,4 @@
-import { FLAG_SQUARE, REVEAL_SQUARE } from "../actions/actionTypes";
+import { FLAG_SQUARE, REVEAL_SQUARE, RESTART_GAME } from "../actions/actionTypes";
 import { numCols, numRows } from "../constants";
 import { HIDDEN, CLEARED, BOMB, FLAGGED } from "../squareStatus";
 
@@ -161,6 +161,10 @@ const updateBoard = (state = INITIAL_STATE, action) => {
                 return {...state, statuses};
             }
             return state;
+        }
+
+        case RESTART_GAME: {
+            return INITIAL_STATE;
         }
 
         default: {
