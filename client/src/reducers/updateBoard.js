@@ -67,7 +67,7 @@ const countSurroundingBombs = (bombSquares, row, col) => {
     return count;
 };
 
-const clearSurroundingSquares = (counts, statuses, bombSquares, row, col) => {
+const clearEmptySquares = (counts, statuses, bombSquares, row, col) => {
     // Run a depth first search to clear out the nearby
     // squares that don't have any surrounding bombs.
     const seen = new Set();
@@ -125,6 +125,7 @@ const updateBoard = (state = INITIAL_STATE, action) => {
                 bombSquares = initializeBombSquares();
                 bombSquares.delete(locToId(row, col));
             }
+            // Update the board statuses and counts.
             const statuses = copyBoard(state.statuses);
             statuses[row][col] = CLEARED;
             let counts = state.counts;
@@ -133,8 +134,7 @@ const updateBoard = (state = INITIAL_STATE, action) => {
                 const count = countSurroundingBombs(bombSquares, row, col);
                 counts[row][col] = count;
                 if (count === 0) {
-                    console.log("start clear");
-                    clearSurroundingSquares(counts, statuses, bombSquares, row, col);
+                    clearEmptySquares(counts, statuses, bombSquares, row, col);
                 }
             }
             return {
@@ -145,6 +145,7 @@ const updateBoard = (state = INITIAL_STATE, action) => {
                 "isFirstMove": false,
             }
         }
+
         case FLAG_SQUARE: {
             const row = action.squareRow;
             const col = action.squareCol;
@@ -161,6 +162,7 @@ const updateBoard = (state = INITIAL_STATE, action) => {
             }
             return state;
         }
+
         default: {
             return state;
         }
