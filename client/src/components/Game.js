@@ -1,13 +1,18 @@
 import React from 'react';
 import { connect } from "react-redux";
 import Board from './Board';
-import {restartGame} from "../actions";
+import { restartGame } from "../actions";
+import { GAME_STATUS } from "../constants";
 
 
 const Game = props => {
-    let status = "Keep going!";
-    if (props.isOver) {
-        status = "Game over!";
+    let status;
+    if (props.gameStatus === GAME_STATUS.WON) {
+        status = "You won!";
+    } else if (props.gameStatus === GAME_STATUS.LOST) {
+        status = "You lost. Try again!"
+    } else {
+        status = "Keep going!"
     }
 
     return (
@@ -26,7 +31,7 @@ const Game = props => {
 };
 
 const mapStateToProps = state => ({
-    isOver: state.isOver,
+    gameStatus: state.gameStatus,
 });
 
 const mapDispatchToProps = dispatch => ({

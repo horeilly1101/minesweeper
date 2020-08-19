@@ -8,3 +8,8 @@ export const SQUARE_STATUS = {
     BOMB: 2,
     FLAGGED: 3,
 };
+export const GAME_STATUS = {
+    IN_PROGRESS: 0,
+    WON: 1,
+    LOST: 2,
+};

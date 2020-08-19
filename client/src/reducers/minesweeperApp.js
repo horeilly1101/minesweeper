@@ -1,5 +1,6 @@
 import { 
-    NUM_COLS, NUM_ROWS, NUM_BOMBS, BOARD_SIZE, SQUARE_STATUS
+    NUM_COLS, NUM_ROWS, NUM_BOMBS, BOARD_SIZE, SQUARE_STATUS,
+    GAME_STATUS
 } from "../constants";
 import * as _ from "underscore";
 import {
@@ -15,7 +16,7 @@ const INITIAL_STATE = {
     })),
     numBombsFlagged: 0,
     numSquaresCleared: 0,
-    isOver: false,
+    gameStatus: GAME_STATUS.IN_PROGRESS,
 };
 
 const initializeBombSquares = () => {
@@ -87,9 +88,12 @@ const clearEmptySquares = (squares, bombSquares, squareId) => {
     return {numSquaresCleared: numCleared, squares};
 };
 
-const isGameOver = (numBombsFlagged, numSquaresCleared) => (
-    numBombsFlagged + numSquaresCleared === BOARD_SIZE
-);
+const getGameStatus = (numBombsFlagged, numSquaresCleared) => {
+    if (numBombsFlagged + numSquaresCleared === BOARD_SIZE) {
+        return GAME_STATUS.WON;
+    }
+    return GAME_STATUS.IN_PROGRESS;
+};
 
 const minesweeperApp = (state = INITIAL_STATE, action) => {
     switch (action.type) {
@@ -113,7 +117,7 @@ const minesweeperApp = (state = INITIAL_STATE, action) => {
                     ...squares[squareId],
                     status: SQUARE_STATUS.BOMB,
                 };
-                return {...state, squares, isOver: true};
+                return {...state, squares, gameStatus: GAME_STATUS.LOST};
             }
             // Reveal the selected square, and keep track of how many squares
             // are cleared.
@@ -137,7 +141,7 @@ const minesweeperApp = (state = INITIAL_STATE, action) => {
                 ...state,
                 squares,
                 numSquaresCleared,
-                isOver: isGameOver(state.numBombsFlagged, numSquaresCleared),
+                gameStatus: getGameStatus(state.numBombsFlagged, numSquaresCleared),
             };
         }
 
@@ -155,7 +159,7 @@ const minesweeperApp = (state = INITIAL_STATE, action) => {
                     ...state,
                     squares,
                     numBombsFlagged,
-                    isOver: isGameOver(numBombsFlagged, state.numSquaresCleared),
+                    gameStatus: getGameStatus(numBombsFlagged, state.numSquaresCleared),
                 };
             }
             if (square.status === SQUARE_STATUS.FLAGGED) {

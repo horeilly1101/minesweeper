@@ -1,3 +1,5 @@
+import { GAME_STATUS } from "./constants";
+
 export const FLAG_SQUARE = "FLAG_SQUARE";
 export const REVEAL_SQUARE = "REVEAL_SQUARE";
 export const INIT_BOMB_SQUARES = "INIT_BOMB_SQUARES";
@@ -27,14 +29,14 @@ export const clickSquare = squareId => (dispatch, getState) =>  {
     if (!state.areBombSquaresInitialized) {
         dispatch(initBombSquares(squareId));
     }
-    if (!state.isOver) {
+    if (state.gameStatus === GAME_STATUS.IN_PROGRESS) {
         dispatch(revealSquare(squareId));
     }
 };
 
 export const rightClickSquare = squareId => (dispatch, getState) => {
   const state = getState();
-  if (!state.isOver) {
+  if (state.gameStatus === GAME_STATUS.IN_PROGRESS) {
       dispatch(flagSquare(squareId));
   }
 };
