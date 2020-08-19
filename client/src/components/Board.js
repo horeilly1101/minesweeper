@@ -2,7 +2,6 @@ import React from 'react';
 import { connect } from "react-redux";
 import Square from './Square';
 import { rightClickSquare, clickSquare } from "../actions";
-import { NUM_ROWS, NUM_COLS } from "../constants";
 
 
 class Board extends React.Component {
@@ -23,8 +22,9 @@ class Board extends React.Component {
     }
 
     renderRow(row) {
-        const squares = Array(NUM_COLS).fill(null)
-            .map((val, i) => this.renderSquare(NUM_COLS * row + i));
+        const numCols = this.props.numCols;
+        const squares = Array(numCols).fill(null)
+            .map((val, i) => this.renderSquare(numCols * row + i));
         return (
             <div className="board-row" key={row}>
                 {squares}
@@ -33,7 +33,7 @@ class Board extends React.Component {
     }
 
     render() {
-        const rows = Array(NUM_ROWS).fill(null)
+        const rows = Array(this.props.numRows).fill(null)
             .map((val, i) => this.renderRow(i));
         return (
             <div>
@@ -45,6 +45,8 @@ class Board extends React.Component {
 
 const mapStateToProps = state => ({
     squares: state.squares,
+    numRows: state.numRows,
+    numCols: state.numCols,
 });
 
 const mapDispatchToProps = dispatch => ({
