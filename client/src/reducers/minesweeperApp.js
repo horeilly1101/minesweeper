@@ -91,7 +91,7 @@ const isGameOver = (numBombsFlagged, numSquaresCleared) => (
     numBombsFlagged + numSquaresCleared === BOARD_SIZE
 );
 
-const updateBoard = (state = INITIAL_STATE, action) => {
+const minesweeperApp = (state = INITIAL_STATE, action) => {
     switch (action.type) {
         case INIT_BOMB_SQUARES: {
             const bombSquares = initializeBombSquares();
@@ -181,4 +181,4 @@ const updateBoard = (state = INITIAL_STATE, action) => {
     }
 };
 
-export default updateBoard;
+export default minesweeperApp;

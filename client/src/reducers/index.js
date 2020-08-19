@@ -1,4 +1,4 @@
 // import { combineReducers } from "actions";
-// import updateBoard from "./updateBoard";
+// import minesweeperApp from "./minesweeperApp";
 //
-// export default combineReducers({ updateBoard });
+// export default combineReducers({ minesweeperApp });

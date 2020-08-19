@@ -1,5 +1,5 @@
 import { createStore, applyMiddleware } from "redux";
 import thunk from 'redux-thunk';
-import rootReducer from "./reducers/updateBoard";
+import rootReducer from "./reducers/minesweeperApp";
 
 export default createStore(rootReducer, applyMiddleware(thunk));
