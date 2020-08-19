@@ -6,9 +6,10 @@ import * as _ from "underscore";
 import {
     FLAG_SQUARE, INIT_BOMB_SQUARES, RESTART_GAME, REVEAL_SQUARE
 } from "../actions";
+import { produce } from "immer";
 
 const INITIAL_STATE = {
-    bombSquares: new Set(),
+    bombSquares: [],
     areBombSquaresInitialized: false,
     squares: Object.assign({}, Array(BOARD_SIZE).fill({
         status: SQUARE_STATUS.HIDDEN,
@@ -22,7 +23,7 @@ const INITIAL_STATE = {
 const initializeBombSquares = () => {
     // Randomly select the bomb squares.
     let bombSquares = Array.from(Array(BOARD_SIZE).keys());
-    return new Set(_.sample(bombSquares, NUM_BOMBS));
+    return _.sample(bombSquares, NUM_BOMBS);
 };
 
 const getSurroundingSquares = squareId => {
@@ -49,140 +50,106 @@ const countSurroundingBombs = (bombSquares, squareId) => {
     const surroundingSquares = getSurroundingSquares(squareId);
     for (let i = 0; i < surroundingSquares.length; i++) {
         const neighborId = surroundingSquares[i];
-        if (bombSquares.has(neighborId)) {
+        if (bombSquares.includes(neighborId)) {
             count++;
         }
     }
     return count;
 };
 
-const clearEmptySquares = (squares, bombSquares, squareId) => {
+const clearEmptySquares = (draft, squareId) => {
     // Run a depth first search to clear out the nearby
     // squares that don't have any surrounding bombs.
     const seen = new Set();
     const stack = [];
     stack.push(squareId);
     seen.add(squareId);
-    let numCleared = 0;
 
     while (stack.length > 0) {
         const nextId = stack.pop();
-        if (bombSquares.has(nextId)) {
+        if (draft.bombSquares.includes(nextId)) {
             continue;
         }
-        const count = countSurroundingBombs(bombSquares, nextId);
-        squares[nextId] = {count: count, status: SQUARE_STATUS.CLEARED};
-        numCleared++;
+        const count = countSurroundingBombs(draft.bombSquares, nextId);
+        draft.squares[nextId] = {count: count, status: SQUARE_STATUS.CLEARED};
+        draft.numSquaresCleared++;
         if (count > 0) {
             continue;
         }
         const surrounding = getSurroundingSquares(nextId);
         for (let i = 0; i < surrounding.length; i++) {
             const successorId = surrounding[i];
-            if (!seen.has(successorId) && squares[successorId].status === SQUARE_STATUS.HIDDEN) {
+            const successorStatus = draft.squares[successorId].status;
+            if (!seen.has(successorId) && successorStatus === SQUARE_STATUS.HIDDEN) {
                 stack.push(successorId);
                 seen.add(successorId);
             }
         }
     }
-    return {numSquaresCleared: numCleared, squares};
 };
 
-const getGameStatus = (numBombsFlagged, numSquaresCleared) => {
-    if (numBombsFlagged + numSquaresCleared === BOARD_SIZE) {
-        return GAME_STATUS.WON;
-    }
-    return GAME_STATUS.IN_PROGRESS;
-};
+const isGameWon = (draft) => (
+    draft.numBombsFlagged + draft.numSquaresCleared === BOARD_SIZE
+);
 
-const minesweeperApp = (state = INITIAL_STATE, action) => {
+const minesweeperApp = (state = INITIAL_STATE, action) => produce(state, draft => {
     switch (action.type) {
         case INIT_BOMB_SQUARES: {
-            const bombSquares = initializeBombSquares();
-            bombSquares.delete(action.squareId);
-            return {...state, bombSquares, areBombSquaresInitialized: true};
+            draft.bombSquares = initializeBombSquares();
+            draft.areBombSquaresInitialized = true;
+            break;
         }
 
         case REVEAL_SQUARE: {
             const squareId = action.squareId;
             // Do nothing if the square is not hidden.
-            const squareStatus = state.squares[squareId].status;
-            if (squareStatus !== SQUARE_STATUS.HIDDEN) {
-                return state;
+            if (draft.squares[squareId].status !== SQUARE_STATUS.HIDDEN) {
+                break;
             }
             // End the game if the bomb was clicked.
-            if (state.bombSquares.has(squareId)) {
-                const squares = {...state.squares};
-                squares[squareId] = {
-                    ...squares[squareId],
-                    status: SQUARE_STATUS.BOMB,
-                };
-                return {...state, squares, gameStatus: GAME_STATUS.LOST};
+            if (draft.bombSquares.includes(squareId)) {
+                draft.squares[squareId] = {status: SQUARE_STATUS.BOMB};
+                draft.gameStatus = GAME_STATUS.LOST;
+                break;
             }
             // Reveal the selected square, and keep track of how many squares
             // are cleared.
-            let squares = {...state.squares};
-            let numSquaresCleared = state.numSquaresCleared;
-            const count = countSurroundingBombs(state.bombSquares, squareId);
+            const count = countSurroundingBombs(draft.bombSquares, squareId);
             if (count > 0) {
-                squares[squareId] = {count, status: SQUARE_STATUS.CLEARED};
-                numSquaresCleared++;
+                draft.squares[squareId] = {count, status: SQUARE_STATUS.CLEARED};
+                draft.numSquaresCleared++;
             } else {
                 // If there are no surrounding bombs, then clear all surrounding
                 // empty squares, including the current square.
-                let {
-                    numSquaresCleared: justCleared,
-                    squares: newSquares
-                } = clearEmptySquares(squares, state.bombSquares, squareId);
-                squares = newSquares;
-                numSquaresCleared += justCleared;
+                clearEmptySquares(draft, squareId);
             }
-            return {
-                ...state,
-                squares,
-                numSquaresCleared,
-                gameStatus: getGameStatus(state.numBombsFlagged, numSquaresCleared),
-            };
+            draft.gameStatus = (isGameWon(draft)) ? GAME_STATUS.WON : GAME_STATUS.IN_PROGRESS;
+            break;
         }
 
         case FLAG_SQUARE: {
-            const square = state.squares[action.squareId];
+            const square = draft.squares[action.squareId];
             if (square.status === SQUARE_STATUS.HIDDEN) {
-                const squares = {...state.squares};
-                squares[action.squareId] = {status: SQUARE_STATUS.FLAGGED};
-                // Keep track of the number of bombs flagged.
-                let numBombsFlagged = state.numBombsFlagged;
-                if (state.bombSquares.has(action.squareId)) {
-                    numBombsFlagged++;
+                draft.squares[action.squareId] = {status: SQUARE_STATUS.FLAGGED};
+                if (draft.bombSquares.includes(action.squareId)) {
+                    draft.numBombsFlagged++;
                 }
-                return {
-                    ...state,
-                    squares,
-                    numBombsFlagged,
-                    gameStatus: getGameStatus(numBombsFlagged, state.numSquaresCleared),
-                };
+                draft.gameStatus = (isGameWon(draft)) ? GAME_STATUS.WON : GAME_STATUS.IN_PROGRESS;
+                break;
             }
             if (square.status === SQUARE_STATUS.FLAGGED) {
-                const squares = {...state.squares};
-                squares[action.squareId] = {status: SQUARE_STATUS.HIDDEN};
-                let numBombsFlagged = state.numBombsFlagged;
-                // Keep track of the number of bombs flagged.
-                if (state.bombSquares.has(action.squareId)) {
-                    numBombsFlagged--;
+                draft.squares[action.squareId] = {status: SQUARE_STATUS.HIDDEN};
+                if (draft.bombSquares.includes(action.squareId)) {
+                    draft.numBombsFlagged--;
                 }
-                return {...state, squares, numBombsFlagged};
             }
-            return state;
+            break;
         }
 
         case RESTART_GAME: {
             return INITIAL_STATE;
         }
-
-        default: {
-            return state;
-        }
     }
-};
+});
 
 export default minesweeperApp;
