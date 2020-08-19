@@ -92,7 +92,7 @@ const isGameWon = (draft) => (
     draft.numBombsFlagged + draft.numSquaresCleared === BOARD_SIZE
 );
 
-const minesweeperApp = (state = INITIAL_STATE, action) => produce(state, draft => {
+const updateGameState = (state = INITIAL_STATE, action) => produce(state, draft => {
     switch (action.type) {
         case INIT_BOMB_SQUARES: {
             draft.bombSquares = initializeBombSquares();
@@ -152,4 +152,4 @@ const minesweeperApp = (state = INITIAL_STATE, action) => produce(state, draft =
     }
 });
 
-export default minesweeperApp;
+export default updateGameState;
