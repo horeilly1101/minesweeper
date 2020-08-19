@@ -1,5 +1,5 @@
 # Minesweeper
-> 💣🚩 This is a full stack minesweeper game, playable in the browser.
+> 💣 A full stack minesweeper game, playable in the browser.
 
 ## The client
 
