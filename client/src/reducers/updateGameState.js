@@ -58,8 +58,8 @@ const countSurroundingBombs = (bombSquares, squareId) => {
 };
 
 const clearEmptySquares = (draft, squareId) => {
-    // Run a depth first search to clear out the nearby
-    // squares that don't have any surrounding bombs.
+    // Run a depth first search to clear out the nearby squares that
+    // don't have any surrounding bombs.
     const seen = new Set();
     const stack = [];
     stack.push(squareId);
@@ -148,6 +148,10 @@ const updateGameState = (state = INITIAL_STATE, action) => produce(state, draft 
 
         case RESTART_GAME: {
             return INITIAL_STATE;
+        }
+
+        default: {
+            return state;
         }
     }
 });
