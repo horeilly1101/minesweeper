@@ -1,7 +1,5 @@
 # Minesweeper
-> Minesweeper game, playable in the browser.
-
-This is a full stack minesweeper game.
+> This is a full stack minesweeper game, playable in the browser.
 
 ## The client
 
