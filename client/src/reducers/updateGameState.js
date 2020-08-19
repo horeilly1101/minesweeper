@@ -24,7 +24,7 @@ const INITIAL_STATE = {
     numCols: DEFAULT_NUM_COLS,
 };
 
-const initializeBombSquares = (draft, excludedId) => {
+const generateBombSquares = (draft, excludedId) => {
     // Randomly select the bomb squares.
     const boardSize = draft.numRows * draft.numCols;
     const bombSquares = Array.from(Array(boardSize).keys());
@@ -102,7 +102,7 @@ const isGameWon = (draft) => {
 const updateGameState = (state = INITIAL_STATE, action) => produce(state, draft => {
     switch (action.type) {
         case INIT_BOMB_SQUARES: {
-            draft.bombSquares = initializeBombSquares(draft, action.squareId);
+            draft.bombSquares = generateBombSquares(draft, action.squareId);
             draft.areBombSquaresInitialized = true;
             break;
         }
