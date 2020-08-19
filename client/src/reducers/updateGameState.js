@@ -24,26 +24,31 @@ const INITIAL_STATE = {
     numCols: DEFAULT_NUM_COLS,
 };
 
-const generateBombSquares = (draft, excludedId) => {
+const generateBombSquares = (state, excludedId) => {
     // Randomly select the bomb squares.
-    const boardSize = draft.numRows * draft.numCols;
+    const boardSize = state.numRows * state.numCols;
     const bombSquares = Array.from(Array(boardSize).keys());
     bombSquares.splice(excludedId, 1);
-    return _.sample(bombSquares, draft.numBombs);
+    return _.sample(bombSquares, state.numBombs);
 };
 
-const getSurroundingSquares = (draft, squareId) => {
+const isGameWon = (state) => {
+    const boardSize = state.numRows * state.numCols;
+    return state.numBombsFlagged + state.numSquaresCleared === boardSize;
+};
+
+const getSurroundingSquares = (state, squareId) => {
     // This is easiest to compute if we transform the squareId to
     // a row value and a column value.
-    const row = Math.floor(squareId / draft.numCols);
-    const col = squareId - draft.numCols * row;
+    const row = Math.floor(squareId / state.numCols);
+    const col = squareId - state.numCols * row;
     const surroundingSquares = [];
     for (let i = -1; i <= 1; i++) {
         for (let j = -1; j <= 1; j++) {
             const newRow = row + i;
             const newCol = col + j;
-            if (newRow >= 0 && newCol >= 0 && newRow < draft.numRows && newCol < draft.numCols) {
-                const newId = newRow * draft.numCols + newCol;
+            if (newRow >= 0 && newCol >= 0 && newRow < state.numRows && newCol < state.numCols) {
+                const newId = newRow * state.numCols + newCol;
                 surroundingSquares.push(newId);
             }
         }
@@ -51,12 +56,12 @@ const getSurroundingSquares = (draft, squareId) => {
     return surroundingSquares;
 };
 
-const countSurroundingBombs = (draft, squareId) => {
+const countSurroundingBombs = (state, squareId) => {
     let count = 0;
-    const surroundingSquares = getSurroundingSquares(draft, squareId);
+    const surroundingSquares = getSurroundingSquares(state, squareId);
     for (let i = 0; i < surroundingSquares.length; i++) {
         const neighborId = surroundingSquares[i];
-        if (draft.bombSquares.includes(neighborId)) {
+        if (state.bombSquares.includes(neighborId)) {
             count++;
         }
     }
@@ -92,11 +97,6 @@ const clearEmptySquares = (draft, squareId) => {
             }
         }
     }
-};
-
-const isGameWon = (draft) => {
-    const boardSize = draft.numRows * draft.numCols;
-    return draft.numBombsFlagged + draft.numSquaresCleared === boardSize;
 };
 
 const updateGameState = (state = INITIAL_STATE, action) => produce(state, draft => {
