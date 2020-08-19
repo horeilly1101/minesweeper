@@ -24,8 +24,8 @@ const initBombSquares = squareId => ({
 
 export const clickSquare = squareId => (dispatch, getState) =>  {
     const state = getState();
-    if (state.isFirstMove) {
-        dispatch(initBombSquares());
+    if (!state.areBombSquaresInitialized) {
+        dispatch(initBombSquares(squareId));
     }
     if (!state.isOver) {
         dispatch(revealSquare(squareId));

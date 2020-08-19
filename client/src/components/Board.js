@@ -2,7 +2,7 @@ import React from 'react';
 import { connect } from "react-redux";
 import Square from './Square';
 import { rightClickSquare, clickSquare } from "../actions";
-import { numRows, numCols } from "../constants";
+import { NUM_ROWS, NUM_COLS } from "../constants";
 
 
 class Board extends React.Component {
@@ -23,8 +23,8 @@ class Board extends React.Component {
     }
 
     renderRow(row) {
-        const squares = Array(numCols).fill(null)
-            .map((val, i) => this.renderSquare(numCols * row + i));
+        const squares = Array(NUM_COLS).fill(null)
+            .map((val, i) => this.renderSquare(NUM_COLS * row + i));
         return (
             <div className="board-row" key={row}>
                 {squares}
@@ -33,7 +33,7 @@ class Board extends React.Component {
     }
 
     render() {
-        const rows = Array(numRows).fill(null)
+        const rows = Array(NUM_ROWS).fill(null)
             .map((val, i) => this.renderRow(i));
         return (
             <div>

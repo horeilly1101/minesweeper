@@ -1,5 +1,5 @@
 import React from 'react';
-import { HIDDEN, CLEARED, BOMB, FLAGGED } from "../squareStatus";
+import { SQUARE_STATUS } from "../constants";
 
 class Square extends React.Component {
     shouldComponentUpdate(nextProps) {
@@ -8,19 +8,19 @@ class Square extends React.Component {
 
     render() {
         const infoMap = new Map([
-            [HIDDEN, {
+            [SQUARE_STATUS.HIDDEN, {
                 value: "",
                 styleClass: "hidden-square"
             }],
-            [CLEARED, {
+            [SQUARE_STATUS.CLEARED, {
                 value: (this.props.count) ? this.props.count.toString() : "",
                 styleClass: "cleared-square color-" + this.props.count
             }],
-            [BOMB, {
+            [SQUARE_STATUS.BOMB, {
                 value: "💣",
                 styleClass: "bomb-square"
             }],
-            [FLAGGED, {
+            [SQUARE_STATUS.FLAGGED, {
                 value: "🚩",
                 styleClass: "hidden-square"
             }],
