@@ -1,43 +1,49 @@
-import { 
-    NUM_COLS, NUM_ROWS, NUM_BOMBS, BOARD_SIZE, SQUARE_STATUS,
-    GAME_STATUS
-} from "../constants";
 import * as _ from "underscore";
+import { produce } from "immer";
+import { SQUARE_STATUS, GAME_STATUS } from "../constants";
 import {
     FLAG_SQUARE, INIT_BOMB_SQUARES, RESTART_GAME, REVEAL_SQUARE
 } from "../actions";
-import { produce } from "immer";
 
+const DEFAULT_NUM_ROWS = 20;
+const DEFAULT_NUM_COLS = 30;
+const DEFAULT_BOARD_SIZE = DEFAULT_NUM_ROWS * DEFAULT_NUM_COLS;
+const DEFAULT_NUM_BOMBS = 80;
 const INITIAL_STATE = {
     bombSquares: [],
     areBombSquaresInitialized: false,
-    squares: Object.assign({}, Array(BOARD_SIZE).fill({
+    squares: Object.assign({}, Array(DEFAULT_BOARD_SIZE).fill({
         status: SQUARE_STATUS.HIDDEN,
         count: null,
     })),
     numBombsFlagged: 0,
     numSquaresCleared: 0,
     gameStatus: GAME_STATUS.IN_PROGRESS,
+    numBombs: DEFAULT_NUM_BOMBS,
+    numRows: DEFAULT_NUM_ROWS,
+    numCols: DEFAULT_NUM_COLS,
 };
 
-const initializeBombSquares = () => {
+const initializeBombSquares = (draft, excludedId) => {
     // Randomly select the bomb squares.
-    let bombSquares = Array.from(Array(BOARD_SIZE).keys());
-    return _.sample(bombSquares, NUM_BOMBS);
+    const boardSize = draft.numRows * draft.numCols;
+    const bombSquares = Array.from(Array(boardSize).keys());
+    bombSquares.splice(excludedId, 1);
+    return _.sample(bombSquares, draft.numBombs);
 };
 
-const getSurroundingSquares = squareId => {
+const getSurroundingSquares = (draft, squareId) => {
     // This is easiest to compute if we transform the squareId to
     // a row value and a column value.
-    const row = Math.floor(squareId / NUM_COLS);
-    const col = squareId - NUM_COLS * row;
+    const row = Math.floor(squareId / draft.numCols);
+    const col = squareId - draft.numCols * row;
     const surroundingSquares = [];
     for (let i = -1; i <= 1; i++) {
         for (let j = -1; j <= 1; j++) {
             const newRow = row + i;
             const newCol = col + j;
-            if (newRow >= 0 && newCol >= 0 && newRow < NUM_ROWS && newCol < NUM_COLS) {
-                const newId = newRow * NUM_COLS + newCol;
+            if (newRow >= 0 && newCol >= 0 && newRow < draft.numRows && newCol < draft.numCols) {
+                const newId = newRow * draft.numCols + newCol;
                 surroundingSquares.push(newId);
             }
         }
@@ -45,12 +51,12 @@ const getSurroundingSquares = squareId => {
     return surroundingSquares;
 };
 
-const countSurroundingBombs = (bombSquares, squareId) => {
+const countSurroundingBombs = (draft, squareId) => {
     let count = 0;
-    const surroundingSquares = getSurroundingSquares(squareId);
+    const surroundingSquares = getSurroundingSquares(draft, squareId);
     for (let i = 0; i < surroundingSquares.length; i++) {
         const neighborId = surroundingSquares[i];
-        if (bombSquares.includes(neighborId)) {
+        if (draft.bombSquares.includes(neighborId)) {
             count++;
         }
     }
@@ -70,13 +76,13 @@ const clearEmptySquares = (draft, squareId) => {
         if (draft.bombSquares.includes(nextId)) {
             continue;
         }
-        const count = countSurroundingBombs(draft.bombSquares, nextId);
+        const count = countSurroundingBombs(draft, nextId);
         draft.squares[nextId] = {count: count, status: SQUARE_STATUS.CLEARED};
         draft.numSquaresCleared++;
         if (count > 0) {
             continue;
         }
-        const surrounding = getSurroundingSquares(nextId);
+        const surrounding = getSurroundingSquares(draft, nextId);
         for (let i = 0; i < surrounding.length; i++) {
             const successorId = surrounding[i];
             const successorStatus = draft.squares[successorId].status;
@@ -88,14 +94,15 @@ const clearEmptySquares = (draft, squareId) => {
     }
 };
 
-const isGameWon = (draft) => (
-    draft.numBombsFlagged + draft.numSquaresCleared === BOARD_SIZE
-);
+const isGameWon = (draft) => {
+    const boardSize = draft.numRows * draft.numCols;
+    return draft.numBombsFlagged + draft.numSquaresCleared === boardSize;
+};
 
 const updateGameState = (state = INITIAL_STATE, action) => produce(state, draft => {
     switch (action.type) {
         case INIT_BOMB_SQUARES: {
-            draft.bombSquares = initializeBombSquares();
+            draft.bombSquares = initializeBombSquares(draft, action.squareId);
             draft.areBombSquaresInitialized = true;
             break;
         }
@@ -114,13 +121,14 @@ const updateGameState = (state = INITIAL_STATE, action) => produce(state, draft 
             }
             // Reveal the selected square, and keep track of how many squares
             // are cleared.
-            const count = countSurroundingBombs(draft.bombSquares, squareId);
+            const count = countSurroundingBombs(draft, squareId);
             if (count > 0) {
                 draft.squares[squareId] = {count, status: SQUARE_STATUS.CLEARED};
                 draft.numSquaresCleared++;
             } else {
                 // If there are no surrounding bombs, then clear all surrounding
-                // empty squares, including the current square.
+                // empty squares, including the current square. This updates the
+                // draft.
                 clearEmptySquares(draft, squareId);
             }
             draft.gameStatus = (isGameWon(draft)) ? GAME_STATUS.WON : GAME_STATUS.IN_PROGRESS;
@@ -142,6 +150,7 @@ const updateGameState = (state = INITIAL_STATE, action) => produce(state, draft 
                 if (draft.bombSquares.includes(action.squareId)) {
                     draft.numBombsFlagged--;
                 }
+                break;
             }
             break;
         }
