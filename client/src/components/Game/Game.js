@@ -11,10 +11,16 @@ const Game = props => {
     let buttonStyle;
     if (props.gameStatus === GAME_STATUS.WON) {
         buttonText = "Play Again";
-        buttonStyle = {background: "#41FF1E"};
+        buttonStyle = {
+            background: "#41FF1E",
+            color: "#FFFFFF",
+        };
     } else if (props.gameStatus === GAME_STATUS.LOST) {
         buttonText = "Play Again";
-        buttonStyle = {backgroundColor: "#FF5353"};
+        buttonStyle = {
+            backgroundColor: "#FF5353",
+            color: "#FFFFFF",
+        };
     } else {
         buttonText = "Restart Game";
         buttonStyle = {};
