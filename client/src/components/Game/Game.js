@@ -2,18 +2,22 @@ import React from 'react';
 import './Game.css';
 import { connect } from "react-redux";
 import Board from '../Board/Board';
-import { restartGame } from "../../actions";
+import { restartGame } from "../../actions/creators";
 import { GAME_STATUS } from "../../constants";
 
 
 const Game = props => {
-    let status;
+    let buttonText;
+    let buttonStyle;
     if (props.gameStatus === GAME_STATUS.WON) {
-        status = "You won!";
+        buttonText = "Play Again";
+        buttonStyle = {background: "#41FF1E"};
     } else if (props.gameStatus === GAME_STATUS.LOST) {
-        status = "You lost. Try again!"
+        buttonText = "Play Again";
+        buttonStyle = {backgroundColor: "#FF5353"};
     } else {
-        status = "Keep going!"
+        buttonText = "Restart Game";
+        buttonStyle = {};
     }
 
     return (
@@ -22,12 +26,12 @@ const Game = props => {
                 <Board />
             </div>
             <div className="game-info">
-                <div>{status}</div>
                 <button
                     onClick={props.restartGame}
                     className="restart-game"
+                    style={buttonStyle}
                 >
-                    Restart Game
+                    {buttonText}
                 </button>
             </div>
         </div>

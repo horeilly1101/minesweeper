@@ -2,7 +2,7 @@ import React from 'react';
 import './Board.css';
 import { connect } from "react-redux";
 import Square from '../Square/Square';
-import { rightClickSquare, clickSquare } from "../../actions";
+import { rightClickSquare, clickSquare } from "../../actions/creators";
 
 
 class Board extends React.Component {

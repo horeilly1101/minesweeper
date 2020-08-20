@@ -1,6 +1,6 @@
 import updateGameState from './updateGameState';
 import { GAME_STATUS, SQUARE_STATUS } from "../constants";
-import { revealSquare, flagSquare } from "../actions";
+import { revealSquare, flagSquare } from "../actions/creators";
 
 const TEST_STATE_1 = {
     bombSquares: [3],

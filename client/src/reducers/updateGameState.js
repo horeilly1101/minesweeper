@@ -3,7 +3,7 @@ import { produce } from "immer";
 import { SQUARE_STATUS, GAME_STATUS } from "../constants";
 import {
     FLAG_SQUARE, INIT_BOMB_SQUARES, RESTART_GAME, REVEAL_SQUARE
-} from "../actions";
+} from "../actions/types";
 
 const DEFAULT_NUM_ROWS = 20;
 const DEFAULT_NUM_COLS = 30;
