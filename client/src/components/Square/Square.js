@@ -1,5 +1,6 @@
 import React from 'react';
-import { SQUARE_STATUS } from "../constants";
+import './Square.css';
+import { SQUARE_STATUS } from "../../constants";
 
 class Square extends React.Component {
     shouldComponentUpdate(nextProps) {

@@ -1,8 +1,9 @@
 import React from 'react';
+import './Game.css';
 import { connect } from "react-redux";
-import Board from './Board';
-import { restartGame } from "../actions";
-import { GAME_STATUS } from "../constants";
+import Board from '../Board/Board';
+import { restartGame } from "../../actions";
+import { GAME_STATUS } from "../../constants";
 
 
 const Game = props => {
