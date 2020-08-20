@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Dosis&display=swap');
+
 .status {
     margin-bottom: 10px;
 }
@@ -9,4 +11,20 @@
 
 .game-info {
     margin-left: 20px;
+}
+
+.restart-game {
+    font: 25px 'Dosis';
+    background: #ffffff;
+    border-radius: 10px;
+    border-color: #000;
+    border-width: 2px;
+    padding-left: 20px;
+    padding-right: 20px;
+    outline: none;
+}
+
+.restart-game:hover {
+    background: #000000;
+    color: #ffffff;
 }

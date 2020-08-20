@@ -18,12 +18,15 @@ const Game = props => {
 
     return (
         <div className="game">
-            <div className="game-board">
+            <div>
                 <Board />
             </div>
             <div className="game-info">
                 <div>{status}</div>
-                <button onClick={props.restartGame}>
+                <button
+                    onClick={props.restartGame}
+                    className="restart-game"
+                >
                     Restart Game
                 </button>
             </div>

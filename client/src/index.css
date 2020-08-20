@@ -1,4 +1,6 @@
+@import url('https://fonts.googleapis.com/css2?family=Dosis:wght@500&display=swap');
+
 body {
-  font: 14px "Century Gothic", Futura, sans-serif;
+  font: 14px "Dosis", Futura, sans-serif;
   margin: 20px;
 }
