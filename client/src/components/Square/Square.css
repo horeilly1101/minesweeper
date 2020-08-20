@@ -1,5 +1,4 @@
 .square {
-    background: #fff;
     border: 1px solid #ffffff;
     float: left;
     font-size: 24px;
@@ -15,60 +14,4 @@
 
 .square:focus {
     outline: none;
-}
-
-.bomb-square {
-    background: #FF7373;
-}
-
-.hidden-square {
-    background: #3AA3FF;
-}
-
-.cleared-square {
-    background: #CCE7FF;
-}
-
-/*
- * Describe the text colors for squares that contain
- * this value.
- */
-.color-0 {
-
-}
-
-.color-1 {
-    color: #117A65;
-}
-
-.color-2 {
-    color: #6C3483;
-}
-
-.color-3 {
-    color: #FF8A0D;
-}
-
-.color-4 {
-    color: #FF29DF;
-}
-
-.color-5 {
-    color: #2874A6;
-}
-
-.color-6 {
-    color: #17202A;
-}
-
-.color-7 {
-    color: #17202A;
-}
-
-.color-8 {
-    color: #17202A;
-}
-
-.kbd-navigation .square:focus {
-    background: #ddd;
 }
