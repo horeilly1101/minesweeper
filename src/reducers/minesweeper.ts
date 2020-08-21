@@ -58,7 +58,7 @@ const isBomb = (state: MinesweeperState, squareId: number): boolean => {
     return Object.values(state.bombSquares).includes(squareId);
 };
 
-const getSurroundingSquares = (state: MinesweeperState, squareId: number): number[] => {
+const getSurroundingSquareIds = (state: MinesweeperState, squareId: number): number[] => {
     // This is easiest to compute if we transform the squareId to
     // a row value and a column value.
     const row = Math.floor(squareId / state.numCols);
@@ -79,7 +79,7 @@ const getSurroundingSquares = (state: MinesweeperState, squareId: number): numbe
 
 const countSurroundingBombs = (state: MinesweeperState, squareId: number): number => {
     let count = 0;
-    const surroundingSquares = getSurroundingSquares(state, squareId);
+    const surroundingSquares = getSurroundingSquareIds(state, squareId);
     for (let i = 0; i < surroundingSquares.length; i++) {
         const neighborId = surroundingSquares[i];
         if (isBomb(state, neighborId)) {
@@ -112,7 +112,7 @@ const clearEmptySquares = (draft: MinesweeperState, squareId: number): void => {
         if (count > 0) {
             continue;
         }
-        const surrounding = getSurroundingSquares(draft, nextId);
+        const surrounding = getSurroundingSquareIds(draft, nextId);
         for (let i = 0; i < surrounding.length; i++) {
             const successorId = surrounding[i];
             const successorStatus = draft.squares[successorId].status;
