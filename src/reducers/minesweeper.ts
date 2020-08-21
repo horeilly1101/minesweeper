@@ -124,7 +124,7 @@ const clearEmptySquares = (draft: MinesweeperState, squareId: number): void => {
     }
 };
 
-export const minesweeper = (state: MinesweeperState = INITIAL_STATE, action: ActionTypes): MinesweeperState =>
+export const minesweeper = (state = INITIAL_STATE, action: ActionTypes): MinesweeperState =>
     produce(state, draft => {
         switch (action.type) {
             case INIT_BOMB_SQUARES: {

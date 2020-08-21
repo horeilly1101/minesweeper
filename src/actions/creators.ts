@@ -1,7 +1,7 @@
 import { GAME_STATUS } from "../constants";
 import {
     FLAG_SQUARE, INIT_BOMB_SQUARES, RESTART_GAME, REVEAL_SQUARE,
-    ActionTypes
+    ActionTypes, AppThunk
 } from "./types";
 
 export const flagSquare = (squareId: number): ActionTypes => ({
@@ -23,7 +23,7 @@ export const initBombSquares = (squareId: number): ActionTypes => ({
     squareId: squareId,
 });
 
-export const clickSquare = (squareId: number) => (dispatch: any, getState: any) =>  {
+export const clickSquare = (squareId: number): AppThunk => (dispatch: any, getState: any) => {
     const state = getState();
     if (!state.areBombSquaresInitialized) {
         dispatch(initBombSquares(squareId));
@@ -33,9 +33,9 @@ export const clickSquare = (squareId: number) => (dispatch: any, getState: any) 
     }
 };
 
-export const rightClickSquare = (squareId: number) => (dispatch: any, getState: any) => {
-  const state = getState();
-  if (state.gameStatus === GAME_STATUS.IN_PROGRESS) {
+export const rightClickSquare = (squareId: number): AppThunk => (dispatch: any, getState: any) => {
+    const state = getState();
+    if (state.gameStatus === GAME_STATUS.IN_PROGRESS) {
       dispatch(flagSquare(squareId));
-  }
+    }
 };
