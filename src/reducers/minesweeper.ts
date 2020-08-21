@@ -46,6 +46,7 @@ const generateBombSquares = (state: MinesweeperState, excludedId: number): {[x: 
     const boardSize = state.numRows * state.numCols;
     const bombSquares = Array.from(Array(boardSize).keys());
     bombSquares.splice(excludedId, 1);
+    // @ts-ignore
     return Object.assign({}, _.sample(bombSquares, state.numBombs));
 };
 
