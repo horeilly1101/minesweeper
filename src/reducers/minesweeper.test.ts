@@ -1,4 +1,4 @@
-import updateGameState from './updateGameState';
+import minesweeper from './minesweeper';
 import { GAME_STATUS, SQUARE_STATUS } from "../constants";
 import { revealSquare, flagSquare } from "../actions/creators";
 
@@ -21,24 +21,24 @@ describe("test 2x2 board", () => {
     test("win the game", () => {
         // Clear the squares that don't have bombs.
         // @ts-ignore
-        const afterClick0 = updateGameState(TEST_STATE_1, revealSquare(0));
+        const afterClick0 = minesweeper(TEST_STATE_1, revealSquare(0));
         expect(afterClick0.squares[0].status).toBe(SQUARE_STATUS.CLEARED);
         expect(afterClick0.squares[0].count).toBe(1);
-        const afterClick1 = updateGameState(afterClick0, revealSquare(1));
+        const afterClick1 = minesweeper(afterClick0, revealSquare(1));
         expect(afterClick1.squares[1].status).toBe(SQUARE_STATUS.CLEARED);
         expect(afterClick1.squares[1].count).toBe(1);
-        const afterClick2 = updateGameState(afterClick1, revealSquare(2));
+        const afterClick2 = minesweeper(afterClick1, revealSquare(2));
         expect(afterClick2.squares[2].status).toBe(SQUARE_STATUS.CLEARED);
         expect(afterClick2.squares[2].count).toBe(1);
         // Flag the only bomb.
-        const afterFlag = updateGameState(afterClick2, flagSquare(3));
+        const afterFlag = minesweeper(afterClick2, flagSquare(3));
         expect(afterFlag.squares[3].status).toBe(SQUARE_STATUS.FLAGGED);
         expect(afterFlag.gameStatus).toBe(GAME_STATUS.WON);
     });
 
     test("click on the bomb", () => {
         // @ts-ignore
-        expect(updateGameState(TEST_STATE_1, revealSquare(3)).gameStatus)
+        expect(minesweeper(TEST_STATE_1, revealSquare(3)).gameStatus)
             .toBe(GAME_STATUS.LOST);
     });
 });
@@ -64,7 +64,7 @@ describe("test 3x3 board", () => {
             revealSquare(3), revealSquare(5), flagSquare(2),
             flagSquare(8),
             // @ts-ignore
-        ].reduce((state, action) => updateGameState(state, action), TEST_STATE_2);
+        ].reduce((state, action) => minesweeper(state, action), TEST_STATE_2);
         expect(finalState.gameStatus).toBe(GAME_STATUS.WON);
     });
 
@@ -74,13 +74,13 @@ describe("test 3x3 board", () => {
             flagSquare(3), flagSquare(3), // Undo the flag operation.
             revealSquare(3), flagSquare(2), flagSquare(8),
             // @ts-ignore
-        ].reduce((state, action) => updateGameState(state, action), TEST_STATE_2);
+        ].reduce((state, action) => minesweeper(state, action), TEST_STATE_2);
         expect(finalState.gameStatus).toBe(GAME_STATUS.WON);
     });
 
     test("click on the bomb 1", () => {
         // @ts-ignore
-        expect(updateGameState(TEST_STATE_2, revealSquare(2)).gameStatus)
+        expect(minesweeper(TEST_STATE_2, revealSquare(2)).gameStatus)
             .toBe(GAME_STATUS.LOST);
     });
 });

@@ -1,4 +1,4 @@
 // import { combineReducers } from "actions";
-// import updateGameState from "./updateGameState";
+// import minesweeper from "./minesweeper";
 //
-// export default combineReducers({ updateGameState });
+// export default combineReducers({ minesweeper });

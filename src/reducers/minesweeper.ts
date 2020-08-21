@@ -106,7 +106,7 @@ const clearEmptySquares = (draft, squareId) => {
 };
 
 // @ts-ignore
-const updateGameState = (state = INITIAL_STATE, action) => produce(state, draft => {
+const minesweeper = (state = INITIAL_STATE, action) => produce(state, draft => {
     switch (action.type) {
         case INIT_BOMB_SQUARES: {
             draft.bombSquares = generateBombSquares(draft, action.squareId);
@@ -175,4 +175,4 @@ const updateGameState = (state = INITIAL_STATE, action) => produce(state, draft 
     }
 });
 
-export default updateGameState;
+export default minesweeper;
