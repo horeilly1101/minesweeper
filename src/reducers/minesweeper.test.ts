@@ -35,7 +35,6 @@ describe("test 2x2 board", () => {
     });
 
     test("click on the bomb", () => {
-        // @ts-ignore
         expect(minesweeper(TEST_STATE_1, revealSquare(3)).gameStatus)
             .toBe(GAME_STATUS.LOST);
     });
@@ -60,7 +59,6 @@ describe("test 3x3 board", () => {
         const finalState = [
             revealSquare(3), revealSquare(5), flagSquare(2),
             flagSquare(8),
-            // @ts-ignore
         ].reduce((state, action) => minesweeper(state, action), TEST_STATE_2);
         expect(finalState.gameStatus).toBe(GAME_STATUS.WON);
     });
@@ -70,13 +68,11 @@ describe("test 3x3 board", () => {
             revealSquare(1), revealSquare(5),
             flagSquare(3), flagSquare(3), // Undo the flag operation.
             revealSquare(3), flagSquare(2), flagSquare(8),
-            // @ts-ignore
         ].reduce((state, action) => minesweeper(state, action), TEST_STATE_2);
         expect(finalState.gameStatus).toBe(GAME_STATUS.WON);
     });
 
     test("click on the bomb 1", () => {
-        // @ts-ignore
         expect(minesweeper(TEST_STATE_2, revealSquare(2)).gameStatus)
             .toBe(GAME_STATUS.LOST);
     });
