@@ -3,7 +3,7 @@
 
 This client is written with react + redux, and it was built off of Create React App.<br />
 
-![client screenshot](./public/client.png)
+<img src="./public/minesweeper.png" width="200" />
 
 ## Available Scripts
 
