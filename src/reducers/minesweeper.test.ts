@@ -1,13 +1,12 @@
-import minesweeper from './minesweeper';
+import { minesweeper, MinesweeperState } from './minesweeper';
 import { GAME_STATUS, SQUARE_STATUS } from "../constants";
 import { revealSquare, flagSquare } from "../actions/creators";
 
-const TEST_STATE_1 = {
-    bombSquares: [3],
+const TEST_STATE_1: MinesweeperState = {
+    bombSquares: {0: 3},
     areBombSquaresInitialized: true,
     squares: Object.assign({}, Array(2 * 2).fill({
-        status: SQUARE_STATUS.HIDDEN,
-        count: null,
+        status: SQUARE_STATUS.HIDDEN
     })),
     numBombsFlagged: 0,
     numSquaresCleared: 0,
@@ -20,7 +19,6 @@ const TEST_STATE_1 = {
 describe("test 2x2 board", () => {
     test("win the game", () => {
         // Clear the squares that don't have bombs.
-        // @ts-ignore
         const afterClick0 = minesweeper(TEST_STATE_1, revealSquare(0));
         expect(afterClick0.squares[0].status).toBe(SQUARE_STATUS.CLEARED);
         expect(afterClick0.squares[0].count).toBe(1);
@@ -43,12 +41,11 @@ describe("test 2x2 board", () => {
     });
 });
 
-const TEST_STATE_2 = {
-    bombSquares: [2, 8],
+const TEST_STATE_2: MinesweeperState = {
+    bombSquares: {0: 2, 1: 8},
     areBombSquaresInitialized: true,
     squares: Object.assign({}, Array(3 * 3).fill({
-        status: SQUARE_STATUS.HIDDEN,
-        count: null,
+        status: SQUARE_STATUS.HIDDEN
     })),
     numBombsFlagged: 0,
     numSquaresCleared: 0,
