@@ -3,6 +3,8 @@
 
 This client is written with react + redux, and it was built off of Create React App.<br />
 
+![client screenshot](./public/client.png)
+
 ## Available Scripts
 
 In the project directory, you can run:
