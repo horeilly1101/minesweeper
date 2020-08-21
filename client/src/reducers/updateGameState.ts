@@ -1,3 +1,4 @@
+// @ts-ignore
 import * as _ from "underscore";
 import { produce } from "immer";
 import { SQUARE_STATUS, GAME_STATUS } from "../constants";
@@ -24,6 +25,7 @@ const INITIAL_STATE = {
     numCols: DEFAULT_NUM_COLS,
 };
 
+// @ts-ignore
 const generateBombSquares = (state, excludedId) => {
     // Randomly select the bomb squares.
     const boardSize = state.numRows * state.numCols;
@@ -32,11 +34,13 @@ const generateBombSquares = (state, excludedId) => {
     return _.sample(bombSquares, state.numBombs);
 };
 
+// @ts-ignore
 const isGameWon = (state) => {
     const boardSize = state.numRows * state.numCols;
     return state.numBombsFlagged + state.numSquaresCleared === boardSize;
 };
 
+// @ts-ignore
 const getSurroundingSquares = (state, squareId) => {
     // This is easiest to compute if we transform the squareId to
     // a row value and a column value.
@@ -56,6 +60,7 @@ const getSurroundingSquares = (state, squareId) => {
     return surroundingSquares;
 };
 
+// @ts-ignore
 const countSurroundingBombs = (state, squareId) => {
     let count = 0;
     const surroundingSquares = getSurroundingSquares(state, squareId);
@@ -68,6 +73,7 @@ const countSurroundingBombs = (state, squareId) => {
     return count;
 };
 
+// @ts-ignore
 const clearEmptySquares = (draft, squareId) => {
     // Run a depth first search to clear out the nearby squares that
     // don't have any surrounding bombs.
@@ -99,6 +105,7 @@ const clearEmptySquares = (draft, squareId) => {
     }
 };
 
+// @ts-ignore
 const updateGameState = (state = INITIAL_STATE, action) => produce(state, draft => {
     switch (action.type) {
         case INIT_BOMB_SQUARES: {
@@ -114,6 +121,7 @@ const updateGameState = (state = INITIAL_STATE, action) => produce(state, draft 
                 break;
             }
             // End the game if the bomb was clicked.
+            // @ts-ignore
             if (draft.bombSquares.includes(squareId)) {
                 draft.squares[squareId] = {status: SQUARE_STATUS.BOMB};
                 draft.gameStatus = GAME_STATUS.LOST;
@@ -139,6 +147,7 @@ const updateGameState = (state = INITIAL_STATE, action) => produce(state, draft 
             const square = draft.squares[action.squareId];
             if (square.status === SQUARE_STATUS.HIDDEN) {
                 draft.squares[action.squareId] = {status: SQUARE_STATUS.FLAGGED};
+                // @ts-ignore
                 if (draft.bombSquares.includes(action.squareId)) {
                     draft.numBombsFlagged++;
                 }
@@ -147,6 +156,7 @@ const updateGameState = (state = INITIAL_STATE, action) => produce(state, draft 
             }
             if (square.status === SQUARE_STATUS.FLAGGED) {
                 draft.squares[action.squareId] = {status: SQUARE_STATUS.HIDDEN};
+                // @ts-ignore
                 if (draft.bombSquares.includes(action.squareId)) {
                     draft.numBombsFlagged--;
                 }
