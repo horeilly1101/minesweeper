@@ -5,7 +5,6 @@ import Board from '../Board/Board';
 import { restartGame } from "../../actions/creators";
 import { GAME_STATUS } from "../../constants";
 
-
 const Game = props => {
     let buttonText;
     let buttonStyle;
